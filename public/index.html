@@ -10,27 +10,15 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Canvas-Confetti CDN für Konfetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <!-- Socket.IO Client removed for Vercel optimization -->
   <style>
     /* Basis-Reset */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; }
     
-    /* CSS Variablen für Light/Dark Mode */
-    :root {
-      --bg-overlay-light: rgba(255, 255, 255, 0.8);
-      --text-color-light: #222;
-      --border-color-light: rgba(0, 0, 0, 0.2);
-      
-      --bg-overlay-dark: rgba(0, 0, 0, 0.6);
-      --text-color-dark: #fff;
-      --border-color-dark: rgba(255, 255, 255, 0.2);
-    }
-    
-    /* Animierter Vollbild-Gradient-Hintergrund */
+    /* Erlaube Scrolling */
     body {
       font-family: 'Poppins', sans-serif;
-      overflow: hidden;
+      overflow: auto;
       min-height: 100vh;
       background: linear-gradient(270deg, #a8edea, #fed6e3, #a8edea);
       background-size: 600% 600%;
@@ -42,75 +30,50 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    /* Dunkler Modus Hintergrund */
     body.dark {
       background: linear-gradient(270deg, #232526, #414345);
       background-size: 600% 600%;
       animation: gradientAnimation 15s ease infinite;
     }
     
-    /* Vollbild-Seiten im Glassmorphism-Stil */
+    /* Seiten im Glassmorphism-Stil – Verwende min-height, damit gescrollt werden kann */
     .page {
-      position: absolute;
-      top: 0;
-      left: 0;
+      position: relative;
       width: 100%;
-      height: 100vh;
+      min-height: 100vh;
       padding: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: var(--bg-overlay-light);
-      border: 1px solid var(--border-color-light);
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.2);
       text-align: center;
-      transition: background 0.5s, border-color 0.5s, color 0.5s,
-                  opacity 0.5s ease, transform 0.5s ease;
-      color: var(--text-color-light);
-      pointer-events: none;
-      opacity: 0;
-      transform: translateY(20px);
-      z-index: 1;
+      transition: background 0.5s, border-color 0.5s, color 0.5s, opacity 0.5s ease, transform 0.5s ease;
+      color: #222;
+      margin-bottom: 2rem;
     }
-    .page.active {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-      z-index: 2;
-    }
-    /* Anpassungen im Dunkelmodus */
+    .page.active { z-index: 2; }
     body.dark .page {
-      background: var(--bg-overlay-dark);
-      border: 1px solid var(--border-color-dark);
-      color: var(--text-color-dark);
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
     }
     
-    /* Textboxen für Inhalte */
+    /* Textboxen */
     .text-box {
       background: rgba(255, 255, 255, 0.9);
       padding: 1rem;
       border-radius: 10px;
       margin-bottom: 1rem;
-      transition: background 0.5s, color 0.5s;
       width: 100%;
       max-width: 500px;
     }
-    body.dark .text-box {
-      background: rgba(0, 0, 0, 0.8);
-    }
+    body.dark .text-box { background: rgba(0, 0, 0, 0.8); }
     
     /* Überschriften & Text */
-    h1, h2 {
-      margin-bottom: 1rem;
-      font-size: 2rem;
-      transition: color 0.5s;
-    }
-    p {
-      margin-bottom: 1.5rem;
-      line-height: 1.4;
-      font-size: 1rem;
-      transition: color 0.5s;
-    }
+    h1, h2 { margin-bottom: 1rem; font-size: 2rem; }
+    p { margin-bottom: 1.5rem; line-height: 1.4; font-size: 1rem; }
     
     /* Schaltflächen */
     .btn {
@@ -125,10 +88,7 @@
       font-size: 1rem;
       color: inherit;
     }
-    .btn:hover {
-      transform: scale(1.1);
-      background: rgba(255, 255, 255, 0.5);
-    }
+    .btn:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.5); }
     
     /* Antwortoptionen */
     .option {
@@ -142,17 +102,9 @@
       font-size: 1rem;
       color: inherit;
     }
-    .option:hover {
-      transform: scale(1.03);
-      background: rgba(255, 255, 255, 0.5);
-    }
-    .option.selected {
-      background: rgba(255, 255, 255, 0.7);
-      transform: scale(1.05);
-    }
-    .option input {
-      margin-right: 10px;
-    }
+    .option:hover { transform: scale(1.03); background: rgba(255, 255, 255, 0.5); }
+    .option.selected { background: rgba(255, 255, 255, 0.7); transform: scale(1.05); }
+    .option input { margin-right: 10px; }
     
     /* Diagramm-Container */
     #chartContainer {
@@ -163,7 +115,7 @@
       margin: 20px 0;
     }
     
-    /* Toggle-Schalter für Dark Mode */
+    /* Dark Mode Toggle */
     #toggleMode {
       position: absolute;
       top: 1rem;
@@ -188,14 +140,10 @@
       background: #fff;
       transition: transform 0.5s ease;
     }
-    body.dark #toggleMode {
-      background: #666;
-    }
-    body.dark #toggleMode::before {
-      transform: translateX(30px);
-    }
+    body.dark #toggleMode { background: #666; }
+    body.dark #toggleMode::before { transform: translateX(30px); }
     
-    /* Wellenanimation Overlay – beeindruckender Modewechsel */
+    /* Wave Animation Overlay */
     #waveOverlay {
       position: fixed;
       top: 0;
@@ -217,14 +165,8 @@
       animation: waveAnimation 1s ease-out forwards;
     }
     @keyframes waveAnimation {
-      0% {
-        clip-path: ellipse(0% 0% at top left);
-        opacity: 1;
-      }
-      100% {
-        clip-path: ellipse(150% 150% at top left);
-        opacity: 0;
-      }
+      0% { clip-path: ellipse(0% 0% at top left); opacity: 1; }
+      100% { clip-path: ellipse(150% 150% at top left); opacity: 0; }
     }
     
     /* Share Button */
@@ -260,7 +202,7 @@
   </div>
   
   <!-- Survey Page -->
-  <div id="survey" class="page">
+  <div id="survey" class="page" style="display:none;">
     <div class="text-box">
       <h2 id="questionTitle"></h2>
     </div>
@@ -269,7 +211,7 @@
   </div>
   
   <!-- Results Page -->
-  <div id="results" class="page">
+  <div id="results" class="page" style="display:none;">
     <div class="text-box">
       <h2>Vielen Dank für deine Teilnahme!</h2>
       <p>Hier sind die aktuellen Umfrageergebnisse:</p>
@@ -308,30 +250,29 @@
     const toggleModeBtn = document.getElementById("toggleMode");
     const waveOverlay = document.getElementById("waveOverlay");
 
-    // Poll for updated survey results every 10 seconds (only when on the results page)
+    // On load: if the user already participated (via localStorage), show results
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("surveySubmitted") === "true") {
+        showPage(resultsPage);
+        fetchResults();
+      }
+    });
+    
+    // Poll for updated survey results every 10 seconds (only on results page)
     function pollResults() {
-      if (resultsPage.classList.contains("active")) {
-        fetch('/api/submitSurvey', { method: 'GET' })
-          .then(res => res.json())
-          .then(data => {
-            updateChart(data.results);
-            if (data.currentAISummary) {
-              aiSummaryText.textContent = data.currentAISummary;
-              aiSummaryBox.style.display = "block";
-              shareBtn.style.display = "inline-block";
-            }
-          })
-          .catch(err => console.error("Error fetching survey results:", err));
+      if (resultsPage.style.display !== "none") {
+        fetchResults();
       }
     }
     setInterval(pollResults, 10000);
     
     function showPage(page) {
-      [landingPage, surveyPage, resultsPage].forEach(p => p.classList.remove("active"));
-      page.classList.add("active");
+      // Hide all pages and show the selected one
+      [landingPage, surveyPage, resultsPage].forEach(p => p.style.display = "none");
+      page.style.display = "block";
     }
     
-    // Fetch survey questions from the backend
+    // Fetch survey questions
     async function loadSurvey() {
       try {
         const res = await fetch('/api/survey');
@@ -360,6 +301,21 @@
       });
     }
     
+    // Fetch current results from backend
+    function fetchResults() {
+      fetch('/api/submitSurvey', { method: 'GET' })
+        .then(res => res.json())
+        .then(data => {
+          updateChart(data.results);
+          if (data.currentAISummary) {
+            aiSummaryText.textContent = data.currentAISummary;
+            aiSummaryBox.style.display = "block";
+            shareBtn.style.display = "inline-block";
+          }
+        })
+        .catch(err => console.error("Error fetching survey results:", err));
+    }
+    
     // Event Handlers
     startBtn.addEventListener("click", () => {
       loadSurvey();
@@ -377,7 +333,6 @@
       if (currentQuestionIndex < surveyQuestions.length) {
         loadQuestion();
       } else {
-        // Submit responses to the backend
         try {
           const res = await fetch('/api/submitSurvey', {
             method: 'POST',
@@ -389,6 +344,8 @@
             alert(data.error);
             return;
           }
+          // Mark that the user has participated
+          localStorage.setItem("surveySubmitted", "true");
           showPage(resultsPage);
           updateChart(data.results);
           if (data.currentAISummary) {
@@ -403,45 +360,29 @@
       }
     });
     
+    // Update chart to a Pie Chart
     function updateChart(surveyResults) {
       const isDark = document.body.classList.contains("dark");
       const chartData = {
         labels: surveyQuestions[0].options,
         datasets: [{
-          label: "Antworten",
           data: surveyResults.rating,
-          backgroundColor: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)",
-          borderColor: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
-          borderWidth: 2
+          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+          borderColor: isDark ? "#fff" : "#222",
+          borderWidth: 1
         }]
       };
       const options = {
-        scales: {
-          x: {
-            ticks: { color: isDark ? "#fff" : "#222", font: { size: 14 } },
-            grid: { color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)" }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: { color: isDark ? "#fff" : "#222", font: { size: 14 } },
-            grid: { color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)" }
-          }
-        },
         responsive: true,
-        maintainAspectRatio: false,
-        plugins: { 
-          legend: { display: false },
-          tooltip: {
-            bodyColor: isDark ? "#fff" : "#222",
-            titleColor: isDark ? "#fff" : "#222"
-          }
+        plugins: {
+          legend: { position: 'bottom', labels: { color: isDark ? "#fff" : "#222" } }
         }
       };
       if (chartInstance) {
         chartInstance.destroy();
       }
       chartInstance = new Chart(resultChartCanvas, {
-        type: "bar",
+        type: "pie",
         data: chartData,
         options: options
       });
@@ -460,9 +401,7 @@
       const wave = document.createElement("div");
       wave.className = "wave";
       waveOverlay.appendChild(wave);
-      setTimeout(() => {
-        waveOverlay.innerHTML = "";
-      }, 1000);
+      setTimeout(() => { waveOverlay.innerHTML = ""; }, 1000);
     }
     
     toggleModeBtn.addEventListener("click", () => {
@@ -470,14 +409,12 @@
       setTimeout(() => {
         document.body.classList.toggle("dark");
         [landingPage, surveyPage, resultsPage].forEach(page => page.classList.toggle("dark"));
-        // If results page is active, update chart colors
-        if (resultsPage.classList.contains("active")) {
+        if (resultsPage.style.display !== "none") {
           updateChart(chartInstance ? chartInstance.data.datasets[0].data : { rating: [] });
         }
       }, 200);
     });
     
-    // Share Button using Web Share API
     shareBtn.addEventListener("click", () => {
       if (navigator.share) {
         navigator.share({
@@ -491,7 +428,6 @@
         alert("Dein Browser unterstützt diese Funktion nicht.");
       }
     });
-    
   </script>
 </body>
 </html>
