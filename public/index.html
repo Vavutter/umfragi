@@ -201,16 +201,12 @@
       transform: scale(1.05);
       background: rgba(0,123,255,1);
     }
-    /* =======================
-       Dark Mode Overrides for Buttons & Options
-    ======================= */
     body.dark .btn { background: #0d6efd; }
     body.dark .btn:hover { background: #0b5ed7; }
     body.dark .option { background: rgba(0,0,0,0.5); }
     body.dark .option:hover { background: rgba(0,0,0,0.6); }
     body.dark .option.selected { background: rgba(0,0,0,0.7); }
   </style>
-  
 </head>
 <body>
   <!-- Dark/Light Mode Toggle -->
@@ -250,10 +246,9 @@
     </div>
   </div>
   
-  <!-- Wave Overlay -->
+  <!-- Wave Overlay for Mode Transition -->
   <div id="waveOverlay"></div>
   
-  <!-- JavaScript Code -->
   <script>
     // Global Variables & DOM References
     let surveyQuestions = [];
@@ -289,7 +284,7 @@
       }
     }, 10000);
     
-    // Function to show a page and hide others
+    // Show only the requested page
     function showPage(page) {
       landingPage.style.display = "none";
       surveyPage.style.display = "none";
@@ -297,7 +292,7 @@
       page.style.display = "block";
     }
     
-    // Load survey questions from backend
+    // Fetch survey questions from backend
     async function loadSurvey() {
       try {
         const res = await fetch('/api/survey');
@@ -310,7 +305,7 @@
       }
     }
     
-    // Load the current question and options
+    // Load current question and options
     function loadQuestion() {
       const currentQuestion = surveyQuestions[currentQuestionIndex];
       questionTitle.textContent = currentQuestion.question;
@@ -327,7 +322,7 @@
       });
     }
     
-    // Fetch survey results from backend
+    // Fetch survey results from backend and update chart/summary
     function fetchResults() {
       fetch('/api/submitSurvey', { method: 'GET' })
         .then(res => res.json())
@@ -342,13 +337,13 @@
         .catch(err => console.error("Error fetching survey results:", err));
     }
     
-    // Start survey when button clicked
+    // Start survey
     startBtn.addEventListener("click", () => {
       loadSurvey();
       showPage(surveyPage);
     });
     
-    // Handle Next button (advance question or submit)
+    // Handle Next button (advance question or submit survey)
     nextBtn.addEventListener("click", async () => {
       const selectedOption = document.querySelector('input[name="option"]:checked');
       if (!selectedOption) {
@@ -386,7 +381,7 @@
       }
     });
     
-    // Update the pie chart using Chart.js
+    // Update the pie chart: update existing instance if available, else create new one
     function updateChart(surveyResults) {
       const isDark = document.body.classList.contains("dark");
       const chartData = {
@@ -405,15 +400,21 @@
           legend: { position: 'bottom', labels: { color: isDark ? "#fff" : "#222" } }
         }
       };
-      if (chartInstance) { chartInstance.destroy(); }
-      chartInstance = new Chart(resultChartCanvas, {
-        type: "pie",
-        data: chartData,
-        options: options
-      });
+      // If the chart already exists, update its data instead of destroying it
+      if (chartInstance) {
+        chartInstance.data = chartData;
+        chartInstance.options = options;
+        chartInstance.update();
+      } else {
+        chartInstance = new Chart(resultChartCanvas, {
+          type: "pie",
+          data: chartData,
+          options: options
+        });
+      }
     }
     
-    // Trigger confetti on successful submission
+    // Trigger confetti effect
     function triggerConfetti() {
       confetti({
         particleCount: 150,
@@ -422,7 +423,7 @@
       });
     }
     
-    // Trigger wave animation during dark mode toggle
+    // Trigger wave animation for mode toggle
     function triggerWaveAnimation() {
       waveOverlay.innerHTML = "";
       const wave = document.createElement("div");
@@ -431,7 +432,7 @@
       setTimeout(() => { waveOverlay.innerHTML = ""; }, 1000);
     }
     
-    // Toggle dark mode on click
+    // Manual dark mode toggle
     toggleModeBtn.addEventListener("click", () => {
       triggerWaveAnimation();
       setTimeout(() => {
@@ -457,28 +458,6 @@
         alert("Dein Browser unterstützt diese Funktion nicht.");
       }
     });
-    
-    // Additional utility: debug log function
-    function debugLog(message) {
-      console.log("[DEBUG]: " + message);
-    }
-    debugLog("Survey application initialized.");
-    
-    // Global error handler
-    window.addEventListener("error", (event) => {
-      console.error("Global error caught: ", event.error);
-    });
-    
-    // Example data processing function
-    function processSurveyData(data) {
-      for (let i = 0; i < 1000; i++) {
-        Math.sqrt(i);
-      }
-      return data;
-    }
-    
-    // Uncomment to test processing (for debugging purposes)
-    // updateChart(processSurveyData({ rating: [1, 2, 3, 4, 5] }));
     
   </script>
 </body>
