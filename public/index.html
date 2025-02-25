@@ -10,8 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Canvas-Confetti CDN für Konfetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <!-- Socket.IO Client (wird vom Backend bereitgestellt) -->
-  <script src="/socket.io/socket.io.js"></script>
+  <!-- Socket.IO Client removed for Vercel optimization -->
   <style>
     /* Basis-Reset */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -308,20 +307,24 @@
     const shareBtn = document.getElementById("shareBtn");
     const toggleModeBtn = document.getElementById("toggleMode");
     const waveOverlay = document.getElementById("waveOverlay");
-    
-    // Socket.IO Connection for Real-Time Updates
-    const socket = io();
-    socket.on('updateResults', (data) => {
-      // Update the chart and AI summary if on results page
+
+    // Poll for updated survey results every 10 seconds (only when on the results page)
+    function pollResults() {
       if (resultsPage.classList.contains("active")) {
-        updateChart(data.surveyResults);
-        if(data.currentAISummary) {
-          aiSummaryText.textContent = data.currentAISummary;
-          aiSummaryBox.style.display = "block";
-          shareBtn.style.display = "inline-block";
-        }
+        fetch('/api/submitSurvey', { method: 'GET' })
+          .then(res => res.json())
+          .then(data => {
+            updateChart(data.results);
+            if (data.currentAISummary) {
+              aiSummaryText.textContent = data.currentAISummary;
+              aiSummaryBox.style.display = "block";
+              shareBtn.style.display = "inline-block";
+            }
+          })
+          .catch(err => console.error("Error fetching survey results:", err));
       }
-    });
+    }
+    setInterval(pollResults, 10000);
     
     function showPage(page) {
       [landingPage, surveyPage, resultsPage].forEach(p => p.classList.remove("active"));
@@ -331,7 +334,7 @@
     // Fetch survey questions from the backend
     async function loadSurvey() {
       try {
-        const res = await fetch('/survey');
+        const res = await fetch('/api/survey');
         const data = await res.json();
         surveyQuestions = data.questions;
         currentQuestionIndex = 0;
@@ -348,7 +351,7 @@
       currentQuestion.options.forEach((option, index) => {
         const label = document.createElement("label");
         label.className = "option";
-        label.innerHTML = <input type="radio" name="option" value="${index}"> ${option};
+        label.innerHTML = `<input type="radio" name="option" value="${index}"> ${option}`;
         label.addEventListener("click", () => {
           document.querySelectorAll("label.option").forEach(el => el.classList.remove("selected"));
           label.classList.add("selected");
@@ -376,7 +379,7 @@
       } else {
         // Submit responses to the backend
         try {
-          const res = await fetch('/submitSurvey', {
+          const res = await fetch('/api/submitSurvey', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ responses })
