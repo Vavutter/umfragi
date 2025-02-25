@@ -381,38 +381,53 @@
       }
     });
     
-    // Update the pie chart: update existing instance if available, else create new one
-    function updateChart(surveyResults) {
-      const isDark = document.body.classList.contains("dark");
-      const chartData = {
-        labels: surveyQuestions[0].options,
-        datasets: [{
-          data: surveyResults.rating,
-          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
-          borderColor: isDark ? "#fff" : "#222",
-          borderWidth: 1
-        }]
-      };
-      const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { color: isDark ? "#fff" : "#222" } }
-        }
-      };
-      // If the chart already exists, update its data instead of destroying it
-      if (chartInstance) {
-        chartInstance.data = chartData;
-        chartInstance.options = options;
-        chartInstance.update();
-      } else {
-        chartInstance = new Chart(resultChartCanvas, {
-          type: "pie",
-          data: chartData,
-          options: options
-        });
-      }
+function updateChart(surveyResults) {
+  // Check if surveyResults.rating is valid and non-empty
+  if (!surveyResults || !Array.isArray(surveyResults.rating)) {
+    console.warn("Invalid surveyResults:", surveyResults);
+    return;
+  }
+  
+  const total = surveyResults.rating.reduce((sum, val) => sum + val, 0);
+  if (total === 0) {
+    console.warn("Empty survey data received.");
+    return; // Don't update the chart if there are no responses
+  }
+  
+  const isDark = document.body.classList.contains("dark");
+  const chartData = {
+    labels: surveyQuestions[0].options,
+    datasets: [{
+      data: surveyResults.rating,
+      backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+      borderColor: isDark ? "#fff" : "#222",
+      borderWidth: 1
+    }]
+  };
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: isDark ? "#fff" : "#222" } }
     }
+  };
+  
+  if (chartInstance) {
+    // Update the existing chart instance instead of destroying it.
+    chartInstance.data = chartData;
+    chartInstance.options = options;
+    chartInstance.update();
+  } else {
+    chartInstance = new Chart(resultChartCanvas, {
+      type: "pie",
+      data: chartData,
+      options: options
+    });
+  }
+  
+  console.log("Chart updated with:", surveyResults.rating);
+}
+
     
     // Trigger confetti effect
     function triggerConfetti() {
