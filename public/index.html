@@ -10,103 +10,61 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Canvas-Confetti CDN für Konfetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  
-  <!-- 
-    Extensive CSS styling for our survey application.
-    This includes responsiveness, dark/light mode, glassmorphism effects,
-    and custom animations.
-    
-    (Extra comments and blank lines are included to exceed 500 lines.)
-  -->
-  
   <style>
-    /* ------------------------------------------------------------------------- */
-    /* Basis-Reset und Grund-Schriftgrößen                                        */
-    /* ------------------------------------------------------------------------- */
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-    }
-    
-    html { 
-      font-size: 16px; 
-    }
-    
-    /* ------------------------------------------------------------------------- */
-    /* CSS Variablen für Light und Dark Mode                                    */
-    /* ------------------------------------------------------------------------- */
-    :root {
-      --bg-overlay-light: rgba(255, 255, 255, 0.8);
-      --text-color-light: #222;
-      --border-color-light: rgba(0, 0, 0, 0.2);
-      
-      --bg-overlay-dark: rgba(0, 0, 0, 0.6);
-      --text-color-dark: #fff;
-      --border-color-dark: rgba(255, 255, 255, 0.2);
-    }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Animierter Vollbild-Gradient-Hintergrund – jetzt mit Scroll                */
-    /* ------------------------------------------------------------------------- */
+    /* =======================
+       Reset & Base Styles
+    ======================= */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(270deg, #a8edea, #fed6e3, #a8edea);
       background-size: 600% 600%;
       animation: gradientAnimation 15s ease infinite;
       transition: background 0.5s ease;
-      color: var(--text-color-light);
+      color: #222;
       overflow-y: auto;
       margin: 0;
       padding: 1rem;
       line-height: 1.5;
     }
-    
     @keyframes gradientAnimation {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    
     body.dark {
       background: linear-gradient(270deg, #232526, #414345);
       background-size: 600% 600%;
       animation: gradientAnimation 15s ease infinite;
-      color: var(--text-color-dark);
+      color: #fff;
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Container für alle Seiten – zentriert und im Dokumentfluss                 */
-    /* ------------------------------------------------------------------------- */
+    /* =======================
+       Container & Page Layout
+    ======================= */
     .container {
       max-width: 800px;
       margin: 0 auto;
       padding-bottom: 2rem;
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Seiten (ehemals absolute .page) – jetzt als Block-Elemente                */
-    /* ------------------------------------------------------------------------- */
     .page {
-      background: var(--bg-overlay-light);
-      border: 1px solid var(--border-color-light);
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(0,0,0,0.2);
       border-radius: 10px;
       padding: 2rem;
       margin: 2rem 0;
       text-align: center;
       transition: background 0.5s, border-color 0.5s, color 0.5s;
     }
-    
     body.dark .page {
-      background: var(--bg-overlay-dark);
-      border-color: var(--border-color-dark);
+      background: rgba(0,0,0,0.6);
+      border-color: rgba(255,255,255,0.2);
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Textboxen – begrenzen die Breite und sorgen für automatischen Zeilenumbruch   */
-    /* ------------------------------------------------------------------------- */
+    /* =======================
+       Text & Box Styles
+    ======================= */
     .text-box {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255,255,255,0.9);
       padding: 1rem;
       border-radius: 10px;
       margin: 1rem auto;
@@ -114,31 +72,24 @@
       word-wrap: break-word;
       transition: background 0.5s, color 0.5s;
     }
-    
     body.dark .text-box {
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0,0,0,0.8);
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Überschriften & Fließtext                                                 */
-    /* ------------------------------------------------------------------------- */
     h1, h2 {
       margin-bottom: 1rem;
       font-size: 2rem;
       transition: color 0.5s;
     }
-    
     p {
       margin-bottom: 1.5rem;
       font-size: 1rem;
       transition: color 0.5s;
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Schaltflächen – angepasst an das Original                                */
-    /* ------------------------------------------------------------------------- */
+    /* =======================
+       Button & Option Styles
+    ======================= */
     .btn {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255,255,255,0.3);
       border: none;
       padding: 0.75rem 1.5rem;
       border-radius: 50px;
@@ -149,18 +100,13 @@
       font-size: 1rem;
       color: inherit;
     }
-    
     .btn:hover {
       transform: scale(1.1);
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255,255,255,0.5);
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Antwortoptionen – mit Hover- und Selected-Effekten                        */
-    /* ------------------------------------------------------------------------- */
     .option {
       display: block;
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255,255,255,0.3);
       margin: 10px 0;
       padding: 12px;
       border-radius: 12px;
@@ -170,24 +116,18 @@
       color: inherit;
       text-align: left;
     }
-    
     .option:hover {
       transform: scale(1.03);
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255,255,255,0.5);
     }
-    
     .option.selected {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255,255,255,0.7);
       transform: scale(1.05);
     }
-    
-    .option input {
-      margin-right: 10px;
-    }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Diagramm-Container – für den Chart, responsiv und immer sichtbar            */
-    /* ------------------------------------------------------------------------- */
+    .option input { margin-right: 10px; }
+    /* =======================
+       Chart & Toggle Styles
+    ======================= */
     #chartContainer {
       position: relative;
       height: 300px;
@@ -195,10 +135,6 @@
       max-width: 500px;
       margin: 20px auto;
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Toggle-Schalter für Dark Mode, fixiert oben rechts                         */
-    /* ------------------------------------------------------------------------- */
     #toggleMode {
       position: fixed;
       top: 1rem;
@@ -212,7 +148,6 @@
       transition: background 0.5s ease;
       z-index: 10;
     }
-    
     #toggleMode::before {
       content: "";
       position: absolute;
@@ -224,18 +159,8 @@
       background: #fff;
       transition: transform 0.5s ease;
     }
-    
-    body.dark #toggleMode {
-      background: #666;
-    }
-    
-    body.dark #toggleMode::before {
-      transform: translateX(30px);
-    }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Wellenanimation Overlay – für den Modewechsel-Effekt                       */
-    /* ------------------------------------------------------------------------- */
+    body.dark #toggleMode { background: #666; }
+    body.dark #toggleMode::before { transform: translateX(30px); }
     #waveOverlay {
       position: fixed;
       top: 0;
@@ -245,7 +170,6 @@
       pointer-events: none;
       z-index: 100;
     }
-    
     .wave {
       position: absolute;
       top: 0;
@@ -257,17 +181,12 @@
       transform: rotate(45deg);
       animation: waveAnimation 1s ease-out forwards;
     }
-    
     @keyframes waveAnimation {
       0% { clip-path: ellipse(0% 0% at top left); opacity: 1; }
       100% { clip-path: ellipse(150% 150% at top left); opacity: 0; }
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* Share Button – für das Teilen der Ergebnisse                              */
-    /* ------------------------------------------------------------------------- */
     #shareBtn {
-      background: rgba(0, 123, 255, 0.8);
+      background: rgba(0,123,255,0.8);
       color: #fff;
       border: none;
       padding: 0.75rem 1.5rem;
@@ -278,141 +197,28 @@
       font-size: 1rem;
       transition: transform 0.2s ease, background 0.2s ease;
     }
-    
     #shareBtn:hover {
       transform: scale(1.05);
-      background: rgba(0, 123, 255, 1);
+      background: rgba(0,123,255,1);
     }
-    
-    /* ------------------------------------------------------------------------- */
-    /* End of CSS Styles                                                         */
-    /* ------------------------------------------------------------------------- */
-    
-    
-    /* ------------------------------------------------------------------------- */
-    /* EXTRA COMMENT LINES TO INCREASE FILE LENGTH (BEGIN)                       */
-    /* ------------------------------------------------------------------------- */
-    
-    
-    /* Extra Comment 1 */
-    
-    
-    
-    
-    /* Extra Comment 2 */
-    
-    
-    
-    
-    /* Extra Comment 3 */
-    
-    
-    
-    
-    /* Extra Comment 4 */
-    
-    
-    
-    
-    /* Extra Comment 5 */
-    
-    
-    
-    
-    /* Extra Comment 6 */
-    
-    
-    
-    
-    /* Extra Comment 7 */
-    
-    
-    
-    
-    /* Extra Comment 8 */
-    
-    
-    
-    
-    /* Extra Comment 9 */
-    
-    
-    
-    
-    /* Extra Comment 10 */
-    
-    
-    
-    
-    /* Extra Comment 11 */
-    
-    
-    
-    
-    /* Extra Comment 12 */
-    
-    
-    
-    
-    /* Extra Comment 13 */
-    
-    
-    
-    
-    /* Extra Comment 14 */
-    
-    
-    
-    
-    /* Extra Comment 15 */
-    
-    
-    
-    
-    /* Extra Comment 16 */
-    
-    
-    
-    
-    /* Extra Comment 17 */
-    
-    
-    
-    
-    /* Extra Comment 18 */
-    
-    
-    
-    
-    /* Extra Comment 19 */
-    
-    
-    
-    
-    /* Extra Comment 20 */
-    
-    
-    /* ------------------------------------------------------------------------- */
-    /* EXTRA COMMENT LINES TO INCREASE FILE LENGTH (END)                         */
-    /* ------------------------------------------------------------------------- */
-    
+    /* =======================
+       Dark Mode Overrides for Buttons & Options
+    ======================= */
+    body.dark .btn { background: #0d6efd; }
+    body.dark .btn:hover { background: #0b5ed7; }
+    body.dark .option { background: rgba(0,0,0,0.5); }
+    body.dark .option:hover { background: rgba(0,0,0,0.6); }
+    body.dark .option.selected { background: rgba(0,0,0,0.7); }
   </style>
   
 </head>
 <body>
-  <!-- ----------------------------------------------------------------------- -->
-  <!-- Dark/Light Mode Toggle Button -->
-  <!-- ----------------------------------------------------------------------- -->
+  <!-- Dark/Light Mode Toggle -->
   <button id="toggleMode" aria-label="Toggle Dark Mode"></button>
   
-  <!-- ----------------------------------------------------------------------- -->
-  <!-- Hauptcontainer für alle Seiten -->
-  <!-- ----------------------------------------------------------------------- -->
+  <!-- Main Container -->
   <div class="container">
-    
-    <!-- --------------------------------------------------------------------- -->
     <!-- Landing Page -->
-    <!-- --------------------------------------------------------------------- -->
     <div id="landing" class="page">
       <div class="text-box">
         <h1>Deine Meinung zählt!</h1>
@@ -420,10 +226,7 @@
       </div>
       <button id="startBtn" class="btn">Umfrage starten</button>
     </div>
-    
-    <!-- --------------------------------------------------------------------- -->
     <!-- Survey Page -->
-    <!-- --------------------------------------------------------------------- -->
     <div id="survey" class="page" style="display: none;">
       <div class="text-box">
         <h2 id="questionTitle"></h2>
@@ -431,10 +234,7 @@
       <div id="optionsContainer"></div>
       <button id="nextBtn" class="btn">Weiter</button>
     </div>
-    
-    <!-- --------------------------------------------------------------------- -->
     <!-- Results Page -->
-    <!-- --------------------------------------------------------------------- -->
     <div id="results" class="page" style="display: none;">
       <div class="text-box">
         <h2>Vielen Dank für deine Teilnahme!</h2>
@@ -448,36 +248,18 @@
       </div>
       <button id="shareBtn" class="btn" style="display: none;">Ergebnis teilen</button>
     </div>
-    
   </div>
   
-  <!-- ----------------------------------------------------------------------- -->
-  <!-- Wave Overlay für Modewechsel -->
-  <!-- ----------------------------------------------------------------------- -->
+  <!-- Wave Overlay -->
   <div id="waveOverlay"></div>
   
-  <!-- ----------------------------------------------------------------------- -->
-  <!-- Extensive JavaScript Section -->
-  <!-- ----------------------------------------------------------------------- -->
-  
+  <!-- JavaScript Code -->
   <script>
-    /************************************************************************************/
-    /* Global Variables & DOM References                                              */
-    /************************************************************************************/
-    
-    // Array to hold survey questions
+    // Global Variables & DOM References
     let surveyQuestions = [];
-    
-    // Current question index tracker
     let currentQuestionIndex = 0;
-    
-    // Array to store user responses
     const responses = [];
-    
-    // Chart.js instance variable
     let chartInstance = null;
-    
-    // DOM element references
     const landingPage = document.getElementById("landing");
     const surveyPage = document.getElementById("survey");
     const resultsPage = document.getElementById("results");
@@ -492,41 +274,30 @@
     const toggleModeBtn = document.getElementById("toggleMode");
     const waveOverlay = document.getElementById("waveOverlay");
     
-    /************************************************************************************/
-    /* Initialization: Check if user already participated and load appropriate page    */
-    /************************************************************************************/
+    // Check if user already participated
     document.addEventListener("DOMContentLoaded", () => {
-      // Check if the user has already participated via localStorage flag
       if (localStorage.getItem("surveySubmitted") === "true") {
         showPage(resultsPage);
         fetchResults();
       }
     });
     
-    /************************************************************************************/
-    /* Polling: Refresh survey results every 10 seconds if on the results page           */
-    /************************************************************************************/
+    // Poll for updated survey results every 10 seconds
     setInterval(() => {
       if (resultsPage.style.display !== "none") {
         fetchResults();
       }
     }, 10000);
     
-    /************************************************************************************/
-    /* Function: showPage - displays the given page and hides the others                */
-    /************************************************************************************/
+    // Function to show a page and hide others
     function showPage(page) {
-      // Hide all pages
       landingPage.style.display = "none";
       surveyPage.style.display = "none";
       resultsPage.style.display = "none";
-      // Display the requested page
       page.style.display = "block";
     }
     
-    /************************************************************************************/
-    /* Function: loadSurvey - fetches survey questions from backend API                 */
-    /************************************************************************************/
+    // Load survey questions from backend
     async function loadSurvey() {
       try {
         const res = await fetch('/api/survey');
@@ -539,20 +310,16 @@
       }
     }
     
-    /************************************************************************************/
-    /* Function: loadQuestion - displays the current question and its options           */
-    /************************************************************************************/
+    // Load the current question and options
     function loadQuestion() {
       const currentQuestion = surveyQuestions[currentQuestionIndex];
       questionTitle.textContent = currentQuestion.question;
       optionsContainer.innerHTML = "";
-      // For each option, create a radio button wrapped in a label
       currentQuestion.options.forEach((option, index) => {
         const label = document.createElement("label");
         label.className = "option";
         label.innerHTML = `<input type="radio" name="option" value="${index}"> ${option}`;
         label.addEventListener("click", () => {
-          // Remove 'selected' class from all options and add to the clicked one
           document.querySelectorAll("label.option").forEach(el => el.classList.remove("selected"));
           label.classList.add("selected");
         });
@@ -560,9 +327,7 @@
       });
     }
     
-    /************************************************************************************/
-    /* Function: fetchResults - fetches the current survey results from backend           */
-    /************************************************************************************/
+    // Fetch survey results from backend
     function fetchResults() {
       fetch('/api/submitSurvey', { method: 'GET' })
         .then(res => res.json())
@@ -577,17 +342,13 @@
         .catch(err => console.error("Error fetching survey results:", err));
     }
     
-    /************************************************************************************/
-    /* Event Handler: Start Survey Button                                               */
-    /************************************************************************************/
+    // Start survey when button clicked
     startBtn.addEventListener("click", () => {
       loadSurvey();
       showPage(surveyPage);
     });
     
-    /************************************************************************************/
-    /* Event Handler: Next Button - records response and moves to next question or submits */
-    /************************************************************************************/
+    // Handle Next button (advance question or submit)
     nextBtn.addEventListener("click", async () => {
       const selectedOption = document.querySelector('input[name="option"]:checked');
       if (!selectedOption) {
@@ -610,7 +371,6 @@
             alert(data.error);
             return;
           }
-          // Set flag to prevent multiple submissions
           localStorage.setItem("surveySubmitted", "true");
           showPage(resultsPage);
           updateChart(data.results);
@@ -626,9 +386,7 @@
       }
     });
     
-    /************************************************************************************/
-    /* Function: updateChart - uses Chart.js to render a pie chart of survey results     */
-    /************************************************************************************/
+    // Update the pie chart using Chart.js
     function updateChart(surveyResults) {
       const isDark = document.body.classList.contains("dark");
       const chartData = {
@@ -647,9 +405,7 @@
           legend: { position: 'bottom', labels: { color: isDark ? "#fff" : "#222" } }
         }
       };
-      if (chartInstance) { 
-        chartInstance.destroy(); 
-      }
+      if (chartInstance) { chartInstance.destroy(); }
       chartInstance = new Chart(resultChartCanvas, {
         type: "pie",
         data: chartData,
@@ -657,9 +413,7 @@
       });
     }
     
-    /************************************************************************************/
-    /* Function: triggerConfetti - triggers a confetti effect on successful submission    */
-    /************************************************************************************/
+    // Trigger confetti on successful submission
     function triggerConfetti() {
       confetti({
         particleCount: 150,
@@ -668,9 +422,7 @@
       });
     }
     
-    /************************************************************************************/
-    /* Function: triggerWaveAnimation - creates a wave effect during mode toggling         */
-    /************************************************************************************/
+    // Trigger wave animation during dark mode toggle
     function triggerWaveAnimation() {
       waveOverlay.innerHTML = "";
       const wave = document.createElement("div");
@@ -679,9 +431,7 @@
       setTimeout(() => { waveOverlay.innerHTML = ""; }, 1000);
     }
     
-    /************************************************************************************/
-    /* Event Handler: Dark Mode Toggle                                                  */
-    /************************************************************************************/
+    // Toggle dark mode on click
     toggleModeBtn.addEventListener("click", () => {
       triggerWaveAnimation();
       setTimeout(() => {
@@ -693,9 +443,7 @@
       }, 200);
     });
     
-    /************************************************************************************/
-    /* Event Handler: Web Share API for Sharing Survey Results                          */
-    /************************************************************************************/
+    // Share survey results using Web Share API
     shareBtn.addEventListener("click", () => {
       if (navigator.share) {
         navigator.share({
@@ -709,9 +457,29 @@
         alert("Dein Browser unterstützt diese Funktion nicht.");
       }
     });
-
+    
+    // Additional utility: debug log function
+    function debugLog(message) {
+      console.log("[DEBUG]: " + message);
+    }
+    debugLog("Survey application initialized.");
+    
+    // Global error handler
+    window.addEventListener("error", (event) => {
+      console.error("Global error caught: ", event.error);
+    });
+    
+    // Example data processing function
+    function processSurveyData(data) {
+      for (let i = 0; i < 1000; i++) {
+        Math.sqrt(i);
+      }
+      return data;
+    }
+    
+    // Uncomment to test processing (for debugging purposes)
+    // updateChart(processSurveyData({ rating: [1, 2, 3, 4, 5] }));
+    
   </script>
-  
-
 </body>
 </html>
