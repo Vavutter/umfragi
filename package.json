@@ -1,0 +1,11 @@
+{
+  "name": "UmfrageKZ2025,
+  "version": "1.0.0",
+  "description": "A serverless survey app for Österreichischer Lehrplan Umfrage optimized for Vercel.",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "author": "",
+  "license": "MIT",
+  "type": "module"
+}
