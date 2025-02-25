@@ -381,20 +381,35 @@
       }
     });
     
+let lastValidData = null;
+
 function updateChart(surveyResults) {
-  // Check if surveyResults.rating is valid and non-empty
+  // Validate the surveyResults data
   if (!surveyResults || !Array.isArray(surveyResults.rating)) {
     console.warn("Invalid surveyResults:", surveyResults);
     return;
   }
   
+  // Calculate total responses
   const total = surveyResults.rating.reduce((sum, val) => sum + val, 0);
-  if (total === 0) {
-    console.warn("Empty survey data received.");
-    return; // Don't update the chart if there are no responses
+  
+  // If no responses and we have previous valid data, keep using that
+  if (total === 0 && lastValidData) {
+    console.warn("Received empty data; using last valid data.");
+    surveyResults = lastValidData;
+  } else if (total > 0) {
+    // Store as last valid data if we have a non-zero total
+    lastValidData = surveyResults;
+  } else {
+    // No valid data at all: don't update the chart.
+    console.warn("Empty survey data and no previous valid data.");
+    return;
   }
   
+  // Determine color scheme
   const isDark = document.body.classList.contains("dark");
+  
+  // Prepare Chart.js data and options
   const chartData = {
     labels: surveyQuestions[0].options,
     datasets: [{
@@ -404,6 +419,7 @@ function updateChart(surveyResults) {
       borderWidth: 1
     }]
   };
+  
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -412,8 +428,8 @@ function updateChart(surveyResults) {
     }
   };
   
+  // Update the existing chart or create a new one if needed
   if (chartInstance) {
-    // Update the existing chart instance instead of destroying it.
     chartInstance.data = chartData;
     chartInstance.options = options;
     chartInstance.update();
