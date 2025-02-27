@@ -4,6 +4,7 @@ export default function handler(req, res) {
       {
         question: "Wie bewertest du den österreichischen Lehrplan?",
         options: ["Sehr schlecht", "Schlecht", "Neutral", "Gut", "Sehr gut"]
+        
       }
     ];
     res.status(200).json({ questions: surveyQuestions });
